@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Weather App JS</title>
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            background: #222;
+            color: white;
+        }
+
+        input,
+        button {
+            padding: 10px;
+            margin: 10px;
+            width: 250px;
+        }
+
+        .card {
+            background: #333;
+            margin: 10px;
+            padding: 15px;
+            border-radius: 10px;
+            display: inline-block;
+            width: 200px;
+        }
+
+        .forecast-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Weather App Using JavaScript</h1>
+
+    <input type="text" id="city" placeholder="Enter city name">
+    <br>
+    <button onclick="getWeather()">Search</button>
+
+    <div id="weatherData"></div>
+
+    <h2>5-Day Forecast</h2>
+    <div id="forecast" class="forecast-container"></div>
+
+    <script>
+        const apiKey = "df8cbef4e773db5448ff8a040e042293";
+
+        function formatTime(timestamp) {
+            return new Date(timestamp * 1000).toLocaleTimeString();
+        }
+
+        function getWeather() {
+            const city = document.getElementById("city").value;
+
+            if (!city) {
+                alert("Please enter a city name");
+                return;
+            }
+
+            const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+            const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`;
+
+            // Current Weather
+            fetch(weatherUrl)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("weatherData").innerHTML = `
+            <div class="card">
+              <h3>Description</h3>
+              <p>${data.weather[0].description}</p>
+            </div>
+            <div class="card">
+              <h3>Temperature</h3>
+              <p>${data.main.temp} °C</p>
+            </div>
+            <div class="card">
+              <h3>Max Temp</h3>
+              <p>${data.main.temp_max} °C</p>
+            </div>
+            <div class="card">
+              <h3>Min Temp</h3>
+              <p>${data.main.temp_min} °C</p>
+            </div>
+            <div class="card">
+              <h3>Humidity</h3>
+              <p>${data.main.humidity} %</p>
+            </div>
+            <div class="card">
+              <h3>Sunrise</h3>
+              <p>${formatTime(data.sys.sunrise)}</p>
+            </div>
+            <div class="card">
+              <h3>Sunset</h3>
+              <p>${formatTime(data.sys.sunset)}</p>
+            </div>
+            <div class="card">
+              <h3>Country</h3>
+              <p>${data.sys.country}</p>
+            </div>
+            <div class="card">
+              <h3>Pressure</h3>
+              <p>${data.main.pressure} hPa</p>
+            </div>
+          `;
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("City not found!");
+                });
+
+            // Forecast
+            fetch(forecastUrl)
+                .then(res => res.json())
+                .then(data => {
+                    const forecastDiv = document.getElementById("forecast");
+                    forecastDiv.innerHTML = "";
+
+                    const uniqueDays = [];
+
+                    data.list.forEach(item => {
+                        const date = new Date(item.dt * 1000).getDate();
+
+                        if (!uniqueDays.includes(date) && uniqueDays.length < 5) {
+                            uniqueDays.push(date);
+
+                            const div = document.createElement("div");
+                            div.className = "card";
+
+                            div.innerHTML = `
+                <h4>${new Date(item.dt * 1000).toLocaleDateString()}</h4>
+                <p>${item.weather[0].description}</p>
+                <p>${item.main.temp} °C</p>
+              `;
+
+                            forecastDiv.appendChild(div);
+                        }
+                    });
+                })
+                .catch(err => console.error(err));
+        }
+    </script>
+
+</body>
+
+</html>

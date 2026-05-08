@@ -30,7 +30,18 @@ button {
   color: black;
   font-weight: 700;
   cursor: pointer;
+  transition: all 0.3s ease
 }
+
+button:hover {
+  background: #ffaa00;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(255, 191, 0, 0.5);
+}
+
+/* button:active {
+  transform: scaleX(-0.86);
+} */
 
 h1, h2 {
     color: darkblue;
